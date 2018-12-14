@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="Diretorio:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/Diretorio_jar</output-path>
+    <root id="archive" name="Diretorio.jar">
+      <element id="module-output" name="Diretorio" />
+    </root>
+  </artifact>
+</component>
