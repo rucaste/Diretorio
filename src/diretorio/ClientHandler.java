@@ -67,7 +67,7 @@ public class ClientHandler implements Runnable {
 					sendMessage("END");
 				}
 				else if(str.equals("BYE")) {
-					diretorio.removeClientHandler(this);
+					diretorio.removeClientHandler(this, true);
 				}
 				else if(str.equals("HI")) {
 					this.setLastActivityTime(System.currentTimeMillis());

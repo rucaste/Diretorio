@@ -42,14 +42,11 @@ public class Diretorio {
 			serverSocket = new ServerSocket(port);
 			System.out.println("Diretorio iniciado e a aceitar pedidos em " + serverSocket.toString());
 			while (!Thread.currentThread().isInterrupted()) {
-				try {
-					waitForConnection();
-					buildClientHandler();
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
+				waitForConnection();
+				buildClientHandler();
 			}
 		} catch (IOException e) {
+			System.out.println("Tentativa de ligação de " + socket.toString() + " falhou!");
 			e.printStackTrace();
 		}
 	}
@@ -65,16 +62,19 @@ public class Diretorio {
 		System.out.println("New connection: Client Handler: " + socket.getRemoteSocketAddress().toString());
 	}
 
-	void removeClientHandler(ClientHandler clientHandler) {
-		listClientHandlerSemaphoreAcessManager.acquire();
+	void removeClientHandler(ClientHandler clientHandler, boolean useLocalSemaphore) {
+		if(useLocalSemaphore) {
+			listClientHandlerSemaphoreAcessManager.acquire();
+		}
 		this.listClientHandler.remove(clientHandler);
 		clientHandler.stopThread();
-		listClientHandlerSemaphoreAcessManager.release();
+		if(useLocalSemaphore) {
+			listClientHandlerSemaphoreAcessManager.release();
+		}
 		System.out.println(Thread.currentThread().getName() + " connection closed");
 	}
 
-	// TODO DUPLA SYNC!!!!?
-	synchronized ArrayList<String> CLTResponse() {
+	ArrayList<String> CLTResponse() {
 		ArrayList<String> listaDeClientesAux = new ArrayList<>();
 		listClientHandlerSemaphoreAcessManager.acquire();
 		for (ClientHandler cH : listClientHandler)
@@ -83,12 +83,8 @@ public class Diretorio {
 		return listaDeClientesAux;
 	}
 
-	private void waitForConnection() {
-		try {
-			socket = serverSocket.accept();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+	private void waitForConnection() throws IOException {
+		socket = serverSocket.accept();
 	}
 
 	private void buildClientHandler() {
@@ -110,7 +106,7 @@ public class Diretorio {
 					long time = System.currentTimeMillis();
 					for(ClientHandler clientHandler: Diretorio.getInstance().getListClientHandler()){
 						if(time - clientHandler.getLastActivityTime() > CLIENT_HANDLER_TIMEOUT){
-							Diretorio.getInstance().removeClientHandler(clientHandler);
+							Diretorio.getInstance().removeClientHandler(clientHandler, false);
 						}
 						else {
 							System.out.println("CLient " + clientHandler.toString() + " timein");

@@ -9,8 +9,6 @@ public class MainDiretorio {
 		if(args.length == 0){
 			System.out.println("É necessário indicar o porto de acesso ao Diretorio");
 			exit(1);
-			Diretorio diretorio = new Diretorio(Integer.parseInt(args[0]));
-			diretorio.startDiretorio();
 		}
 		else if(args.length > 1){
 			System.out.println("Os argumentos a seguir ao primeiro foram ignorados");
